@@ -1,0 +1,104 @@
+/sessions/rcw-01qxsvme1w6fxkendzswbxad/tools/root/usr/lib/R/bin/R: line 248: /sessions/rcw-01qxsvme1w6fxkendzswbxad/tools/root/usr/lib/R/etc/ldpaths: No such file or directory
+cannot find system Renviron
+> # Elementary statistics and probability lab in R
+> set.seed(42)
+> out <- file.path("..", "results")
+> dir.create(out, showWarnings = FALSE)
+> png(file.path(out, "r_statistics_lab.png"), width = 1500, height = 1000, res = 130)
+> par(mfrow = c(2, 3))
+> 
+> # 1. Descriptive statistics on simulated exam marks
+> marks <- round(rnorm(60, mean = 68, sd = 12))
+> cat("== Descriptive statistics ==\n"); print(summary(marks))
+== Descriptive statistics ==
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  32.00   60.75   68.50   67.67   76.00   95.00 
+> cat("SD:", round(sd(marks), 3), " Variance:", round(var(marks), 3), " IQR:", IQR(marks), "\n")
+SD: 13.779  Variance: 189.853  IQR: 15.25 
+> hist(marks, breaks = 10, col = "grey70", main = "Histogram of marks", xlab = "marks")
+> boxplot(marks, horizontal = TRUE, main = "Boxplot of marks", col = "grey80")
+> 
+> # 2. Binomial, Poisson, Normal
+> cat("\n== Distributions ==\n")
+
+== Distributions ==
+> cat("Binomial(n=10,p=0.3): P(X=3) =", round(dbinom(3, 10, 0.3), 5), " P(X<=3) =", round(pbinom(3, 10, 0.3), 5), "\n")
+Binomial(n=10,p=0.3): P(X=3) = 0.26683  P(X<=3) = 0.64961 
+> cat("Poisson(lambda=4): P(X=2) =", round(dpois(2, 4), 5), " P(X>=6) =", round(1 - ppois(5, 4), 5), "\n")
+Poisson(lambda=4): P(X=2) = 0.14653  P(X>=6) = 0.21487 
+> cat("Normal(100,15): P(85<X<115) =", round(pnorm(115, 100, 15) - pnorm(85, 100, 15), 5), "\n")
+Normal(100,15): P(85<X<115) = 0.68269 
+> x <- 0:10; plot(x, dbinom(x, 10, 0.3), type = "h", lwd = 6, col = "grey30", main = "Binomial(10, 0.3)", ylab = "P(X=k)")
+> curve(dnorm(x, 100, 15), 55, 145, main = "Normal(100, 15)", ylab = "density"); abline(v = c(85, 115), lty = 2)
+> 
+> # 3. Hypothesis tests
+> cat("\n== Hypothesis tests ==\n")
+
+== Hypothesis tests ==
+> a <- rnorm(30, 70, 10); b <- rnorm(30, 75, 10)
+> tt <- t.test(a, b); print(tt)
+
+	Welch Two Sample t-test
+
+data:  a and b
+t = -1.2284, df = 54.108, p-value = 0.2246
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -7.643291  1.835471
+sample estimates:
+mean of x mean of y 
+ 71.90769  74.81160 
+
+> print(t.test(marks, mu = 65))
+
+	One Sample t-test
+
+data:  marks
+t = 1.4991, df = 59, p-value = 0.1392
+alternative hypothesis: true mean is not equal to 65
+95 percent confidence interval:
+ 64.10725 71.22609
+sample estimates:
+mean of x 
+ 67.66667 
+
+> tab <- matrix(c(30, 20, 15, 35), nrow = 2, dimnames = list(c("A", "B"), c("Pass", "Fail")))
+> print(chisq.test(tab))
+
+	Pearson's Chi-squared test with Yates' continuity correction
+
+data:  tab
+X-squared = 7.9192, df = 1, p-value = 0.004891
+
+> 
+> # 4. Correlation and regression
+> cat("\n== Regression ==\n")
+
+== Regression ==
+> hours <- runif(40, 1, 10); score <- 40 + 5 * hours + rnorm(40, 0, 6)
+> fit <- lm(score ~ hours); print(summary(fit)); cat("Pearson r =", round(cor(hours, score), 4), "\n")
+
+Call:
+lm(formula = score ~ hours)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-10.0878  -2.6329  -0.3948   4.0082  10.4349 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  39.7675     1.8144   21.92   <2e-16 ***
+hours         4.9705     0.3265   15.22   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 5.182 on 38 degrees of freedom
+Multiple R-squared:  0.8592,	Adjusted R-squared:  0.8555 
+F-statistic: 231.8 on 1 and 38 DF,  p-value: < 2.2e-16
+
+Pearson r = 0.9269 
+> plot(hours, score, pch = 19, col = "grey30", main = "Linear regression"); abline(fit, lwd = 2)
+> dev.off()
+null device 
+          1 
+> 
